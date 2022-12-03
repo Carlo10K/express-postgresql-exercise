@@ -1,11 +1,15 @@
 const faker = require('faker');
 const boom = require('@hapi/boom');
+const pool = require('../libs/postgres.pool');
+const sequelize = require('../libs/sequelize'); //sequelize ya usa pool
 
 class ProductsService {
 
   constructor(){
     this.products = [];
     this.generate();
+    this.pool = pool;
+    this.pool.on('error', (err) => console.log(err)); //esto no es necesario si se usa sequelize
   }
 
   generate() {
@@ -30,12 +34,15 @@ class ProductsService {
     return newProduct;
   }
 
-  find() {
-    return this.products;
+  async find() {
+    const query = 'SELECT * FROM tasks';
+    const [data, metadata] = await sequelize.query(query); //sequelize tambien puede hacer querys
+    return {data, metadata};  //en data esta la data, metadata es info adicional
   }
 
   async findOne(id) {
-    const product = this.products.find(item => item.id === id);
+    const query = 'SELECT * FROM tasks WHERE id='+id;
+    const product = await this.pool.query(query);  //usando pool
     if (!product) {
       throw boom.notFound('product not found');
     }
