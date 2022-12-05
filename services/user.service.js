@@ -22,7 +22,9 @@ class UserService {
   }
 
   async find() {
-    const response = await models.User.findAll();   //aqui obtenemos la data desde la clase porque ya no nos referimos a la bd, eso lo hace sequelize
+    const response = await models.User.findAll({
+      include: ['customer']
+    });   //aqui obtenemos la data desde la clase porque ya no nos referimos a la bd, eso lo hace sequelize
     return response;
 
     //const client = await getConnection();
